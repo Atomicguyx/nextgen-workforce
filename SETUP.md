@@ -4,7 +4,7 @@
 1. Make a free project at https://supabase.com
 2. Open **SQL Editor** and run these files from `drizzle/migrations/`, one at a time, in order:
    `0000_migration.sql`, `0001_add_job_site_records.sql`, `0002_store_job_photos_inline.sql`,
-   `0003_add_sales_leads.sql`, `0004_finance_and_auditor.sql`
+   `0003_add_sales_leads.sql`, `0004_finance_and_auditor.sql`, `0005_lock_done_tasks.sql`, `0006_comments_and_notifications.sql`
 3. Open **Project Settings > API** and copy: Project URL, publishable (anon) key, service_role key.
 
 ## 2. Put the code on GitHub
@@ -30,3 +30,11 @@ Export your tables as CSV from the Lovable Cloud database view and import them i
 
 ## Later: custom domain
 Vercel > Project > Settings > Domains. Then update the URLs in step 4.
+
+## Backups and keeping the database awake
+- **Backups:** Team page > "Download full backup" (admins only). Do it weekly and keep the file
+  somewhere safe (Google Drive, a flash drive). Photos are not included.
+- **Free plan pause:** Supabase pauses free projects after about a week of no activity. The file
+  `.github/workflows/keepalive.yml` pings the database twice a week. Add two secrets in GitHub
+  (repo > Settings > Secrets and variables > Actions): `SUPABASE_URL` and `SUPABASE_ANON_KEY`
+  (use the same values as in Vercel). Then open the Actions tab, pick "keep-database-awake" and click "Run workflow" once to test.
