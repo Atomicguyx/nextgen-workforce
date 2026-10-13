@@ -92,10 +92,10 @@ function Tasks() {
                   </div>
                   {t.description && <p className="mt-1 text-xs text-muted-foreground">{t.description}</p>}
                   <p className="mt-2 font-mono text-[11px] text-muted-foreground">{nameOf(t.assignee_id)} · {t.due_date ?? "—"}</p>
-                  <Select value={t.status} onValueChange={(v) => setStatus(t.id, v as Status)}>
+                  <Select value={t.status} disabled={!me.isStaff && t.status === "done"} onValueChange={(v) => setStatus(t.id, v as Status)}>
                     <SelectTrigger className="mt-2 h-8 text-xs"><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      {STATUSES.filter((x) => me.isStaff || x !== "done").map((x) => <SelectItem key={x} value={x}>{STATUS_LABEL[x]}</SelectItem>)}
+                      {STATUSES.filter((x) => me.isStaff || x !== "done" || t.status === "done").map((x) => <SelectItem key={x} value={x}>{STATUS_LABEL[x]}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
