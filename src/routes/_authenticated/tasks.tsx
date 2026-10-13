@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+import { TaskComments } from "@/components/task-comments";
 
 type Status = Database["public"]["Enums"]["task_status"];
 type Priority = Database["public"]["Enums"]["task_priority"];
@@ -23,6 +24,7 @@ export const Route = createFileRoute("/_authenticated/tasks")({
 
 function Tasks() {
   const me = useMe().data!;
+  const [openTask, setOpenTask] = useState<string | null>(null);
   const qc = useQueryClient();
   const tasks = useQuery({
     queryKey: ["tasks", "all"],
@@ -98,6 +100,10 @@ function Tasks() {
                       {STATUSES.filter((x) => me.isStaff || x !== "done" || t.status === "done").map((x) => <SelectItem key={x} value={x}>{STATUS_LABEL[x]}</SelectItem>)}
                     </SelectContent>
                   </Select>
+                  <Button type="button" variant="ghost" size="sm" className="mt-1 h-7 px-1 text-xs" onClick={() => setOpenTask(openTask === t.id ? null : t.id)}>
+                    {openTask === t.id ? "Hide comments" : "Comments"}
+                  </Button>
+                  {openTask === t.id && <TaskComments taskId={t.id} me={{ userId: me.user.id, name: me.profile.full_name, canComment: !me.isAuditor, isStaff: me.isStaff }} />}
                 </div>
               ))}
             </div>

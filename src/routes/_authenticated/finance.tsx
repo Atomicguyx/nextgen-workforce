@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { downloadCsv } from "@/lib/csv";
 
 type Status = Database["public"]["Enums"]["invoice_status"];
 type Invoice = Database["public"]["Tables"]["invoices"]["Row"];
@@ -79,6 +80,9 @@ function Finance() {
       <div>
         <p className="kicker">Money</p>
         <h1 className="mt-2 text-3xl font-semibold">Finance</h1>
+      </div>
+      <div>
+        <Button variant="outline" disabled={!all.length} onClick={() => downloadCsv(`invoices_${today()}.csv`, all.map((i) => ({ Number: i.number, Customer: i.customer_name, Phone: i.customer_phone, Email: i.customer_email, Description: i.description, "Amount (NGN)": i.amount_ngn, "Paid (NGN)": i.paid_ngn, "Balance (NGN)": Number(i.amount_ngn) - Number(i.paid_ngn), Status: i.status, "Issue date": i.issue_date, "Due date": i.due_date, "Paid on": i.paid_at })))}>Export invoices to Excel</Button>
       </div>
 
       <div className="grid gap-3 md:grid-cols-4">

@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+import { downloadCsv } from "@/lib/csv";
 
 type Stage = Database["public"]["Enums"]["lead_stage"];
 type Service = Database["public"]["Enums"]["job_service"];
@@ -77,7 +78,10 @@ function Sales() {
           <p className="kicker">Sales</p>
           <h1 className="mt-2 text-3xl font-semibold">Customers & sales</h1>
         </div>
-        <Button onClick={() => setOpen(!open)}>{open ? "Close" : "Add customer"}</Button>
+        <div className="flex gap-2">
+          <Button variant="outline" disabled={!all.length} onClick={() => downloadCsv(`customers_${today}.csv`, all.map((l) => ({ Customer: l.customer_name, Company: l.company, Phone: l.phone, Email: l.email, City: l.city, Service: l.service, Stage: l.stage, "Value (NGN)": l.value_ngn, Owner: nameOf(l.owner_id), Source: l.source, "Follow-up": l.follow_up_date, Notes: l.notes, Created: l.created_at, Closed: l.closed_at })))}>Export to Excel</Button>
+          <Button onClick={() => setOpen(!open)}>{open ? "Close" : "Add customer"}</Button>
+        </div>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-4">

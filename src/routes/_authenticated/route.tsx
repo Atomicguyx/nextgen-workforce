@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMe, ROLE_LABEL } from "@/lib/me";
 import { useOutbox, useAutoSync, flushOutbox } from "@/lib/offline";
 import { Button } from "@/components/ui/button";
+import { NotificationBell } from "@/components/notification-bell";
 
 function SyncBar() {
   const qc = useQueryClient();
@@ -100,7 +101,10 @@ function Shell() {
             <p className="font-mono text-xs tracking-[0.25em] text-primary">NEXTGEN MATRIX</p>
             <p className="mt-1 text-xs text-muted-foreground">Workforce</p>
           </div>
-          <Button size="icon" variant="ghost" className="md:hidden" onClick={signOut} aria-label="Sign out"><LogOut /></Button>
+          <div className="flex items-center gap-1">
+            <NotificationBell userId={me.data.user.id} />
+            <Button size="icon" variant="ghost" className="md:hidden" onClick={signOut} aria-label="Sign out"><LogOut /></Button>
+          </div>
         </div>
         <nav className="flex gap-1 overflow-x-auto px-2 pb-2 md:flex-col md:px-3">
           {links.filter((l) => l.show).map((l) => (

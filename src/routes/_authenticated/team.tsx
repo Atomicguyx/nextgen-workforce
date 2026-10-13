@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+import { BackupButton } from "@/components/backup-button";
 
 type Status = Database["public"]["Enums"]["agent_status"];
 const ROLES = Object.keys(ROLE_LABEL) as AppRole[];
@@ -67,6 +68,7 @@ function Team() {
         <p className="kicker">People</p>
         <h1 className="mt-2 text-3xl font-semibold">Team</h1>
       </div>
+      {me.isAdmin && <div><BackupButton /> <span className="ml-2 text-xs text-muted-foreground">Saves all records (without photos) to your computer. Do this regularly.</span></div>}
 
       {me.isAdmin && (
         <form onSubmit={invite} className="flex flex-col gap-3 rounded-xl border bg-card p-6 md:flex-row">

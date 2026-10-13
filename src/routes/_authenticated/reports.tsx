@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMe } from "@/lib/me";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { downloadCsv, fetchAll } from "@/lib/csv";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/reports")({
   head: () => ({ meta: [{ title: "Performance reports — NextGen Matrix Workforce" }, { name: "description", content: "Hours, jobs, tasks and sales per person." }] }),
@@ -72,6 +74,35 @@ function Reports() {
     URL.revokeObjectURL(url);
   }
 
+  async function exportAttendance() {
+    try {
+      const start = new Date(from + "T00:00:00").toISOString();
+      const end = new Date(to + "T23:59:59").toISOString();
+      const [att, ppl] = await Promise.all([
+        fetchAll(supabase, "attendance", "*", (q) => q.gte("clock_in", start).lte("clock_in", end)),
+        fetchAll(supabase, "profiles", "id, full_name"),
+      ]);
+      const names = new Map(ppl.map((p) => [String(p.id), String(p.full_name)]));
+      const out = att
+        .sort((x, y) => String(x.clock_in).localeCompare(String(y.clock_in)))
+        .map((a) => {
+          const cin = new Date(String(a.clock_in));
+          const cout = a.clock_out ? new Date(String(a.clock_out)) : null;
+          return {
+            Name: names.get(String(a.user_id)) ?? "Unknown",
+            Date: iso(cin),
+            "Clock in": cin.toLocaleTimeString("en-NG"),
+            "Clock out": cout ? cout.toLocaleTimeString("en-NG") : "Still clocked in",
+            Hours: cout ? Math.round(((cout.getTime() - cin.getTime()) / 3600000) * 100) / 100 : "",
+          };
+        });
+      if (!out.length) return toast.info("No attendance in this period.");
+      downloadCsv(`attendance_${from}_to_${to}.csv`, out);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Export failed");
+    }
+  }
+
   const total = (k: keyof Row) => rows.reduce((s, r) => s + Number(r[k]), 0);
 
   return (
@@ -86,6 +117,7 @@ function Reports() {
           <label className="text-xs text-muted-foreground">From<Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} /></label>
           <label className="text-xs text-muted-foreground">To<Input type="date" value={to} onChange={(e) => setTo(e.target.value)} /></label>
           <Button variant="outline" onClick={exportExcel} disabled={!rows.length}>Export to Excel</Button>
+          <Button variant="outline" onClick={exportAttendance}>Export attendance</Button>
           <Button variant="outline" onClick={() => window.print()} disabled={!rows.length}>Save as PDF</Button>
         </div>
       </div>
