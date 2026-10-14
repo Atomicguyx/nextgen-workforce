@@ -56,6 +56,7 @@ function JobDetail() {
   });
 
   const j = job.data;
+  const locked = !!j && j.status === "signed_off" && !me.isStaff; // agents can't change a signed-off job
   const authorName = (id: string) =>
     people.data?.find((p) => p.id === id)?.full_name ?? (id === me.user.id ? "You" : "Someone");
 
@@ -158,12 +159,6 @@ function JobDetail() {
       toast.error(error.message);
       return;
     }
-    await supabase.from("job_updates").insert({
-      job_id: jobId,
-      author_id: me.user.id,
-      status: "signed_off",
-      body: `Customer sign-off: ${sign.name}`,
-    });
     setBusy(false);
     toast.success("Signed off");
     refresh();
@@ -265,7 +260,7 @@ function JobDetail() {
           <p className="kicker">On-site progress</p>
           <div className="mt-4 flex flex-wrap gap-2">
             {ADVANCE.map((s) => (
-              <Button key={s} size="sm" variant={j.status === s ? "default" : "outline"} disabled={busy} onClick={() => setStatus(s)}>
+              <Button key={s} size="sm" variant={j.status === s ? "default" : "outline"} disabled={busy || locked} onClick={() => setStatus(s)}>
                 {JOB_STATUS_LABEL[s]}
               </Button>
             ))}
@@ -310,7 +305,8 @@ function JobDetail() {
 
       <section className="rounded-xl border bg-card p-6">
         <p className="kicker">Site log</p>
-        <form onSubmit={addUpdate} className="mt-3 space-y-3">
+        {locked && <p className="mt-3 rounded-lg bg-muted/50 p-3 text-sm text-muted-foreground">This job is signed off, so it is now locked. Contact a manager if something needs to change.</p>}
+        {!locked && <form onSubmit={addUpdate} className="mt-3 space-y-3">
           <Textarea
             placeholder="What happened on site? Access, meter readings, faults found, what's pending…"
             value={note}
@@ -325,7 +321,7 @@ function JobDetail() {
               {busy ? "Saving…" : "Log it"}
             </Button>
           </div>
-        </form>
+        </form>}
 
         <ul className="mt-6 space-y-4">
           {(log.data ?? []).map((u) => {
@@ -344,7 +340,7 @@ function JobDetail() {
                     </a>
                   )}
                 </div>
-                {(u.author_id === me.user.id || me.isStaff) && (
+                {((u.author_id === me.user.id && !locked) || me.isStaff) && (
                   <button onClick={() => removeUpdate(u.id)} className="text-xs text-muted-foreground hover:text-destructive">
                     Remove
                   </button>

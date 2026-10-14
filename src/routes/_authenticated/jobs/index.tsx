@@ -109,9 +109,11 @@ function Jobs() {
           <p className="kicker">Field operations</p>
           <h1 className="mt-2 text-3xl font-semibold">Jobs &amp; sites</h1>
         </div>
-        <Button onClick={() => setShowForm((v) => !v)}>
-          <Plus className="size-4" /> {showForm ? "Close" : "New job"}
-        </Button>
+        {me.isStaff && (
+          <Button onClick={() => setShowForm((v) => !v)}>
+            <Plus className="size-4" /> {showForm ? "Close" : "New job"}
+          </Button>
+        )}
       </div>
 
       {showForm && (
@@ -186,7 +188,7 @@ function Jobs() {
         ))}
         {shown.length === 0 && (
           <p className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground lg:col-span-2">
-            No jobs here yet. Add one with “New job”.
+            {me.isStaff ? "No jobs here yet. Add one with “New job”." : "No jobs assigned to you yet."}
           </p>
         )}
       </div>
