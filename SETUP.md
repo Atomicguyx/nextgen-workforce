@@ -4,7 +4,7 @@
 1. Make a free project at https://supabase.com
 2. Open **SQL Editor** and run these files from `drizzle/migrations/`, one at a time, in order:
    `0000_migration.sql`, `0001_add_job_site_records.sql`, `0002_store_job_photos_inline.sql`,
-   `0003_add_sales_leads.sql`, `0004_finance_and_auditor.sql`, `0005_lock_done_tasks.sql`, `0006_comments_and_notifications.sql`
+   `0003_add_sales_leads.sql`, `0004_finance_and_auditor.sql`, `0005_lock_done_tasks.sql`, `0006_comments_and_notifications.sql`, `0007_lock_signed_off_jobs.sql`
 3. Open **Project Settings > API** and copy: Project URL, publishable (anon) key, service_role key.
 
 ## 2. Put the code on GitHub
